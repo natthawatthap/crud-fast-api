@@ -1,5 +1,3 @@
-# core/models/database.py
-
 from motor.motor_asyncio import AsyncIOMotorClient
 from core.settings import MONGODB_URI, MONGODB_DB_NAME
 
@@ -13,7 +11,7 @@ class Database:
         cls.db_name = MONGODB_DB_NAME
 
     @classmethod
-    def get_database(cls):
+    def get_database(cls) -> AsyncIOMotorClient:
         if cls.client is None:
             raise Exception("MongoDB client is not connected.")
         return cls.client[cls.db_name]
