@@ -11,7 +11,7 @@ app = FastAPI()
 app.include_router(api_router, prefix="/v1")
 
 # Set up logging
-logger = LoggingSettings.setup_logging(app)
+logger = LoggingSettings.setup_logging(app) 
 
 # Connect to MongoDB
 @app.on_event("startup")

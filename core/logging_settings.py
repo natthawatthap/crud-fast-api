@@ -1,5 +1,5 @@
 import logging
-
+import os
 
 class LoggingSettings:
     LOG_FILE: str = "app.log"
@@ -12,8 +12,16 @@ class LoggingSettings:
         logger = logging.getLogger(__name__)
         logger.setLevel(LoggingSettings.LOG_LEVEL)
 
+        # Get the absolute path of the log file
+        log_file_path = os.path.abspath(LoggingSettings.LOG_FILE)
+
+        # Ensure the log directory exists
+        log_dir = os.path.dirname(log_file_path)
+        if not os.path.exists(log_dir):
+            os.makedirs(log_dir)
+
         # Create a file handler
-        file_handler = logging.FileHandler(LoggingSettings.LOG_FILE)
+        file_handler = logging.FileHandler(log_file_path, mode='a', encoding='utf-8')
         file_handler.setLevel(LoggingSettings.LOG_LEVEL)
 
         # Create a formatter and set it on the file handler
