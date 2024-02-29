@@ -1,5 +1,6 @@
 import logging
 import os
+import time
 
 class LoggingSettings:
     LOG_FILE: str = "app.log"
@@ -21,7 +22,7 @@ class LoggingSettings:
             os.makedirs(log_dir)
 
         # Create a file handler
-        file_handler = logging.FileHandler(log_file_path, mode='a', encoding='utf-8')
+        file_handler = logging.FileHandler(log_file_path, mode="a", encoding="utf-8")
         file_handler.setLevel(LoggingSettings.LOG_LEVEL)
 
         # Create a formatter and set it on the file handler
@@ -34,14 +35,23 @@ class LoggingSettings:
         # Middleware to log HTTP requests and responses
         @app.middleware("http")
         async def http_middleware(request, call_next):
-            # Log the request
-            logger.info(f"Request: {request.method} {request.url}")
+            # Get the start time
+            start_time = time.time()
+
+            # Get the client's IP address
+            client_ip = request.client.host
+
+            # Log the request with the IP address
+            logger.info(f"Request from {client_ip}: {request.method} {request.url}")
 
             # Call the next middleware
             response = await call_next(request)
 
-            # Log the response
-            logger.info(f"Response: {response.status_code}")
+            # Calculate the latency
+            latency = time.time() - start_time
+
+            # Log the response with the IP address and latency
+            logger.info(f"Response to {client_ip}: {response.status_code} (Latency: {latency:.6f} seconds)")
 
             return response
 
