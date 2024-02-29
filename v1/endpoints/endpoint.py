@@ -1,4 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
+from typing import Dict, Any
+from pymongo import ASCENDING, DESCENDING
 from motor.motor_asyncio import AsyncIOMotorClient
 from bson import ObjectId
 
@@ -35,12 +37,36 @@ async def delete_item(item_id: str, db: AsyncIOMotorClient = Depends(Database.ge
         return {"message": "Item deleted successfully"}
     raise HTTPException(status_code=404, detail="Item not found")
 
-@router.get("/items/", response_model=list[Item])
+@router.get("/items/", response_model=dict)
 async def read_items(
     page: int = Query(1, ge=1),
     per_page: int = Query(10, ge=1, le=100),
     db: AsyncIOMotorClient = Depends(Database.get_database)
-):
+) -> Dict[str, Any]:
+    # Calculate skip count for pagination
     skip_count = (page - 1) * per_page
+    
+    # Fetch items from the database with pagination
     items = await db.items.find().skip(skip_count).limit(per_page).to_list(length=None)
-    return items
+    
+    # Convert ObjectId to string for each item
+    for item in items:
+        item["_id"] = str(item["_id"])
+
+    # Count total number of items
+    total_items = await db.items.count_documents({})
+    
+    # Calculate total number of pages
+    total_pages = (total_items + per_page - 1) // per_page
+    
+    # Construct response payload with items and pagination metadata
+    response_data = {
+        "items": items,
+        "pagination": {
+            "total_items": total_items,
+            "total_pages": total_pages,
+            "page": page,
+        }
+    }
+    
+    return response_data
