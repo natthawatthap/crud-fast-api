@@ -1,5 +1,6 @@
 from motor.motor_asyncio import AsyncIOMotorClient
-from core.settings import MONGODB_URI, MONGODB_DB_NAME
+from core.settings import settings
+
 
 class Database:
     client: AsyncIOMotorClient = None
@@ -7,8 +8,8 @@ class Database:
 
     @classmethod
     async def connect_mongodb(cls):
-        cls.client = AsyncIOMotorClient(MONGODB_URI)
-        cls.db_name = MONGODB_DB_NAME
+        cls.client = AsyncIOMotorClient(settings.MONGODB_URI)
+        cls.db_name = settings.MONGODB_DB_NAME
 
     @classmethod
     def get_database(cls) -> AsyncIOMotorClient:

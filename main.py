@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from v1.api import router as api_router
-from core.settings import PORT
+from core.settings import settings
 from core.models.database import Database
 
 # Create FastAPI instance
@@ -17,4 +17,4 @@ async def startup_event():
 # Run the FastAPI application
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=PORT)
+    uvicorn.run(app, host=settings.HOST, port=settings.PORT)
